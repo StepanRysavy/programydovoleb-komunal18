@@ -1,0 +1,88 @@
+<div class="modal">
+	<div class="vote-modal" v-if="$store.state.votes.hash === '' && $store.state.votes.modal.vote === true">
+		<div class="icon">
+			<img :src='"/static/icon/" + $store.state.votes.modal.type + "-selected.svg"' alt="">
+		</div>
+		<h4>{{ $store.state.votes.modal.candidate.CELEJMENO }}</h4>
+		<template v-if="showCodeInput === false">
+			<div class="vote-option">
+				<button @click="generate">{{ $store.state.votes.modal.type === "tip" ? "Tipnout si" : "Hlasovat" }}</button>
+			</div>
+			<div class="vote-option">
+				<span class="is-link" @click="code">Mám hlasovací kód</span>
+			</div>
+			<div class="vote-option">
+				<span class="is-link" @click="close">Nechci hlasovat</span>
+			</div>
+			<div class="vote-option">
+				<p><small>Hlasováním se k vám uloží <router-link to="/cookies" target="_blank">cookie</router-link> s hlasovacím kódem. Pokud byste se sem během týdne vrátili, automaticky načteme vaše hlasovali. Bez cookie budete muset použít hlasovací kód.</small></p>
+				<p><small><router-link to="/cookies" target="_blank">Více o cookies</router-link></small></p>
+			</div>
+		</template>
+		<template v-if="showCodeInput === true">
+			<p class="error" v-if="$store.state.votes.modal.error != ''">
+				{{ $store.state.votes.modal.error }}
+			</p>
+			<div class="vote-option">
+				<input type="text" placeholder="Můj kód, jako AxFgAAUs" v-model="hash">
+				<button @click="load">Načíst a {{ $store.state.votes.modal.type === "tip" ? "tipnout si" : "hlasovat" }}</button>
+			</div>
+			<div class="vote-option">
+				<span class="is-link" @click="code">Nemám kód</span>
+			</div>
+		</template>
+
+	</div>
+	<div class="vote-modal" v-if="$store.state.votes.hash === '' && $store.state.votes.modal.vote === false">
+		<div class="icon">
+			<img :src='"/static/icon/vote-selected.svg"' alt="">
+		</div>
+		<h4>Zadejte svůj hlasovací kód</h4>
+		<p class="error" v-if="$store.state.votes.modal.error != ''">
+			{{ $store.state.votes.modal.error }}
+		</p>
+		<div class="vote-option">
+			<input type="text" placeholder="něco jako AxFgAAUs" v-model="hash">
+			<button @click="load">Načíst hlasování</button>
+		</div>
+		<div class="vote-option">
+			&middot;
+		</div>
+		<div class="vote-option">
+			<span class="is-link" @click="close">Nemám kód</span>
+		</div>
+	</div>
+	<div class="vote-modal" v-if="$store.state.votes.hash != '' && type === 1">
+		<div class="icon">
+			<img :src='"/static/icon/" + $store.state.votes.modal.type + "-selected.svg"' alt="">
+		</div>
+		<h4>Hotovo</h4>
+		<h5>
+			<router-link :to="'/hlasovani/' + $store.state.votes.view" class="button">
+				Sdílejte svůj {{ $store.state.votes.modal.type === "tip" ? "tip" : "hlas" }}
+			</router-link>
+		</h5>
+		<h4>Bonus</h4>
+		<p>Získal jste unikátní hlasovací kód. Díky němu se ke svému hlasování vždy dostanete.</p>
+		<h1>{{ $store.state.votes.hash }}</h1>
+		<div class="vote-modal-action"><router-link to="/hlasovani">Jak to funguje?</router-link></div>
+		<div class="vote-modal-action"><button @click="close">Zavřít</button></div>
+	</div>
+	<div class="vote-modal" v-if="$store.state.votes.hash != '' && type === 2">
+		<div class="icon">
+			<img :src='"/static/icon/" + $store.state.votes.modal.type + "-selected.svg"' alt="">
+		</div>
+		<h4 v-if="$store.state.votes.dataLoading === true">Načítám hlasování</h4>
+		<h4 v-if="$store.state.votes.dataLoading === false">Hotovo</h4>
+		<p>Váš {{ $store.state.votes.modal.type === "tip" ? "tip" : "hlas" }} byl úspěšně uložen.</p>
+		<br>
+		<h4>Vaše předchozí hlasování</h4>
+		<p>Zároveň jsme načetli vaše předchozí hlasování a tipy.</p>
+		<div class="vote-modal-action">
+			<router-link :to="'/hlasovani/' + $store.state.votes.view" class="button">
+				Zkontrolovat
+			</router-link>
+		</div>
+		<div class="vote-modal-action"><span class="is-link" @click="close">Pokračovat</span></div>
+	</div>
+</div>

@@ -1,0 +1,9 @@
+<div class="vote">
+	<div class="icon" @click="vote" :class="{bigger: verbose === true}">
+		<div class="holder">
+			<img :src="src" :alt="alt" :title="alt">
+			<img :src="srcHover" :alt="alt" :title="alt" class="hover">
+		</div>		
+		<span>{{ label }}</span>
+	</div>
+</div>

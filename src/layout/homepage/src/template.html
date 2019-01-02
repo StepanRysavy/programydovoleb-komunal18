@@ -1,0 +1,57 @@
+<div class="layout-detail">
+	<div class="headline">
+		<div class="mobile-only">
+			<p>Zjistěte, kdo je online, kdo používá sociální média, tipněte si vítěze a zkuste odhadnout, kdo sestaví koalici.</p>
+		</div>
+		<div class="desktop-only">
+			<h1>Porovnejte si volební programy a kandidátky právě u vás</h1>
+			<p>Zjistěte, kdo je online, kdo používá sociální média, tipněte si vítěze a zkuste odhadnout, kdo sestaví vládnoucí koalici.</p>
+		</div>
+	</div>
+	<div class="block list-praha">
+		<h2><router-link :to="'/misto/' + listPriority1.HASH" class="red">Hlavní město Praha</router-link></h2>
+	</div>
+	<div class="block">
+		<h2>Krajská města</h2>
+		<ul>
+			<li v-for="(region, index) in listPriority2">
+				<h4><router-link :to="'/misto/' + region.HASH">{{ region.NAZEVZAST }}</router-link></h4>
+			</li>
+		</ul>
+	</div>
+	<div class="block">
+		<h2>Ostatní města nad 35&nbsp;000 obyvatel</h2>
+		<ul>
+			<li v-for="(region, index) in listPriority3">
+				<h4><router-link :to="'/misto/' + region.HASH">{{ region.NAZEVZAST }}</router-link></h4>
+			</li>
+		</ul>
+	</div>
+	<div class="block large-only">
+		<h2>Najděte své město nebo obec</h2>
+
+		<div class="search">
+			<input type="text" v-model="$store.state.search" class="input" placeholder="Začněte psát jméno obce">
+			<img src="/static/icon/detail.svg" alt="" class="icon-loupe">
+		</div>	
+		<div class="results-holder" v-if="$store.state.results.length > 0">
+			<ul class="results">
+				<li v-for="(result, index) in $store.state.results">
+					<div class="result">
+						<h3>
+							<router-link :to="'/misto/' + result.HASH" v-html="result.NAZEVZAST"></router-link>
+						</h3>
+						<p v-if="$store.state.enum.length > 0">
+							<small v-html="$store.state.enum.find(item => item.NUMNUTS === result.ID_OKRES).NAZEVNUTS"></small>
+						</p>				
+					</div>
+				</li>
+			</ul>
+		</div>
+	</div>
+	<div class="block block-infographics" v-if="$store.state.images.loaded === true && $store.state.images.data.length > 2">
+		<h2>Nejnovější grafy a visuály</h2>
+		<list-of-images :list="latestImages" :columns="3"></list-of-images>
+	</div>
+</div>
+

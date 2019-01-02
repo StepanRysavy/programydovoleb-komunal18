@@ -1,0 +1,45 @@
+<div class="layout-static layout-static-voting">
+	<div class="social">
+		<div class="icon">
+			<img src="/static/icon/vote-selected.svg" alt="">
+		</div>
+		<div class="icon">
+			<img src="/static/icon/tip-selected.svg" alt="">
+		</div>
+	</div>
+	<h1>Hlasování a tipování</h1>
+	<template v-if="$store.state.votingEnabled === false">
+		<h2 class="red">Hlasování bylo ukončeno</h2>	
+	</template>
+	<blockquote>
+		"To by mě zajímalo, kdo u nás letos vyhraje. Jako mám tip, a přestože to hodím někomu jinému, myslím, že to vyhraje jiná kandidátka."
+	</blockquote>
+	<p>Vyzkoušejte si, zda byste dokázali správně <strong>tipnout</strong>, kdo se stane vítězem voleb do zastupitelstva libovolné obce v ČR. V každé obci si můžete tipnout jednu stranu, hnutí nebo jednotlivce. A pak máte ještě možnost <strong>hlasovat</strong>, ale hlas máte do celých voleb jen jeden.</p>
+	<h2>Jak to funguje?</h2>
+	<p>Celé hlasování je anonymní, neuchováváme žádné informace, které by nám umožnily zjistit, kdo konkrétně jak hlasoval. To není ani účel, nejsme výzkumná agentura. Jakmile jednou zahlasujete, získáte svůj hlasovací kód. <strong v-if="$store.state.votes.hash != ''">Ten váš je <em class="red">{{ $store.state.votes.hash }}</em>. </strong>V počítači nebo na mobilu se uloží cookie, které vám pomůže se k vašemu hlasování vrátit. Ale kdyby se to nepovedlo, nebo byste chtěli hlasování zobrazit na jiném zařízení, můžete použít právě tento kód a ke svým bývalým tipům se tak dostanete zpět. Tento kód není nijak spojen s vaším jménem, adresou, ani žádnými dalšími údaji. Je vygenerován z kombinace času a náhodné řady čísel.</p>
+	<div v-if="$store.state.votes.hash === ''">
+		<h2>Jak začít hlasovat?</h2>
+		<p>Jakmile si zobrazíte libovolnou obec nebo detail kandidující strany, uvidíte tam dvě ikonky. Pomocí nich můžete tipovat a hlasovat. Po kliknutí se zobrazí okno, které se vás zeptá, zda jste zde poprvé, nebo zda náhodou nemáte kód. Když budete hlasovat poprvé, tak se vám nový kód vygeneruje. Jakékoli další hlasování už je bez okének, kódů a dotazů.</p>
+		<!-- <p class="center">
+			<router-link to="/obvody" class="button"><b>Vybrat obvod</b></router-link>
+			<router-link to="/kandidati" class="button button-secondary">Vybrat přímo kandidáta</router-link>
+		</p> -->
+		<h2>Jak zjistím, jak jsem hlasoval?</h2>
+		<p>K vašemu hlasovacímu kódu vznikne i speciální stránka, kterou budete moct sdílet na sociálních sítích. Má trošku jiný kód, ale to je schválně. Tu stránku si můžete také uložit do záložek. Stránka s výsledky pak bude vypadat cca takto:</p>
+		<p class="center">
+			<router-link to="/hlasovani/ukazka" class="button">Ukázka hlasovacího lístku</router-link>
+		</p>
+		<h2>Co když si kód včas nezapíšu?</h2>
+		<p>Po celou dobu hlasování uvidíte dole na stránce i svůj hlasovací kód. Kód je uložen i v cookie, takže se pak načte sám. Proto  když si ho nezapíšete napoprvé, nebo se vrátíte po nějaké době, můžete ho tam stále najít. A hned pod ním bude odkaz na hlasovací lístek. Samozřejmě tohle vše funguje, pokud nepoužíváte anonymní okna.</p>
+	</div>
+	<div v-if="$store.state.votes.hash != ''">
+		<h2>Jak zjistím, jak jsem hlasoval?</h2>
+		<p>K vašemu hlasovacímu kódy vznikla i speciální stránka, kterou můžete sdílet na sociálních sítích. Má trošku jiný kód, ale to je schválně. Tu stránku si můžete také uložit do záložek.</p>
+		<p class="center">
+			<router-link :to="'/hlasovani/' + $store.state.votes.view" class="button">Mé tipy a hlasování</router-link>
+		</p>
+	</div>
+	
+
+</div>
+

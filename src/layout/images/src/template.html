@@ -1,0 +1,7 @@
+<div class="layout-images">
+	<h1>Grafy a obrázky ke sdílení</h1>
+	<p>Souhrn všech grafů, statistik, obrazových materiálů, které je možné sdílet</p>
+
+	<list-of-images :list="reverse" :columns="3" v-if="$store.state.images.loaded === true"></list-of-images>
+</div>
+

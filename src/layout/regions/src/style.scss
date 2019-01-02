@@ -1,0 +1,48 @@
+ul, li {
+	padding: 0;
+	margin: 0;
+	list-style: none;
+}
+
+ul {
+	padding: 3rem 0;
+
+	@media (min-width: 42rem) {
+		columns: 3;
+	}
+}
+
+li {
+	break-inside: avoid-column;
+	padding-bottom: .5em;
+}
+
+h3, h4, p {
+	margin: 0;
+}
+
+h1 {
+	margin: 0;
+
+	img {
+		width: 100%;
+		max-width: 30rem;
+		height: auto;
+		margin: auto;
+		display: block;
+	}
+}
+
+h4 {
+	&.rerun a {
+		color: #D7141A;
+	}
+}
+
+.alphabet h3 {
+	margin: 1rem 0;
+}
+
+.alphabet li:first-child h3 {
+	margin-top: 0;
+}

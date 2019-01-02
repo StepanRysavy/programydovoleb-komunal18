@@ -1,0 +1,63 @@
+<div class="layout-detail">
+	<template v-if="loading || $store.state.selectedRegion.data === null">
+		<div class="loading">
+			Načítám ...
+		</div>
+	</template>
+	<template v-if="!loading && $store.state.selectedRegion.data != null"> 
+		<h2 v-if="type === 'tips'">Tipy na vítěze:</h2>
+		<h2 v-if="type === 'votes'">Podpora stran:</h2>
+
+		<p v-if="type === 'tips'"><small>V každé obci si může člověk tipnout vítěze.</small></p>
+		<p v-if="type === 'votes'"><small>Hlas je vyjádřením podpory, lze ho použít jen jednou.</small></p>
+
+		<h1 class="red">{{ name }}</h1>
+		<p><small>Okres {{ area }} / {{ druh }}</small></p>
+		<template v-if="results.length > 0">
+			<table cellpadding="0" cellspacing="0">
+				<tr v-for="(result, index) in results" :class="{out: result.percentage < 5}">
+					<td class="graph">
+						<div class="graph-move">
+							<span class="program-graph" :style="{width: (result.percentage) + '%'}" v-if="result.count > -1"></span>
+						</div>
+					</td>
+					<td class="graph-percent">
+						<small>
+							{{ result.percentage }} %
+						</small>
+					</td>
+					<td class="graph-name program">
+						<h3 v-if="result.data">
+							<router-link :to="'/kandidat/' + result.data.HASH" :title="result.data.NAZEV">
+								{{ result.data.NAZEV }}
+							</router-link>
+						</h3>
+						<div class="graph-move">
+							<div class="program-graph" :style="{width: (result.percentage) + '%'}" v-if="result.count > -1"></div>
+						</div>
+					</td>
+					<td></td>
+				</tr>
+			</table>
+			<p v-if="type === 'tips'">Vítěze si tiplo {{ $store.state.selectedRegion.countTips }} lidí. Stav k 1. říjnu 2018.</p>
+			<p v-if="type === 'votes'">Již hlasovalo {{ $store.state.selectedRegion.countVotes }} lidí. Stav k 1. říjnu 2018.</p>
+			<ul class="btns">
+				<li>
+					<router-link :to="'/misto/' + hash" class="button">Přejít na výpis kandidátů</router-link>
+				</li>
+			</ul>
+		</template>
+		<template v-if="$store.state.selectedRegion.results.length === 0">
+			<p class="actions">Zatím nehlasoval dostatečný počet lidí. Dejte vědět svým přátelům.</p>
+			<ul class="btns">
+				<li>
+					<a :href="'http://www.facebook.com/sharer/sharer.php?u=' + encodeURI(link)" class="button button-secondary" target="_blank" @click="sharebound">Pozvat přátele z Facebooku, ať také hlasují</a>
+				</li>
+				<li>
+					<router-link :to="'/misto/' + hash" class="button">Přejít na výpis kandidátů</router-link>
+				</li>
+			</ul>
+		</template>
+	</template>
+</div>
+

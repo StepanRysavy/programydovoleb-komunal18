@@ -1,0 +1,308 @@
+<div class="layout-detail">
+	<template v-if="loading || $store.state.selectedRegion.data === null">
+		<div class="loading">
+			Načítám ...
+		</div>
+	</template>
+	<template v-if="!loading && $store.state.selectedRegion.data != null"> 
+		<h1>{{ name }}<a name="prehled"></a></h1>
+		<p><small>Okres {{ area }} / {{ druh }}</small></p>
+		<div class="submenu">
+			<ul class="submenu-list">
+				<li><a href="#prehled">Výsledky</a></li>
+				<li v-if="$store.state.selectedRegion.results.length > 0"><a href="#vysledky"><span class="desktop-only" v-if="$store.state.votingDisplay === true">Tipy a </span>Hlasování</a><small> &middot; {{ $store.state.selectedRegion.count }} lidí</small></li>
+				<li><a href="#odhady">Odhady</a></li>
+			</ul>
+		</div>
+		<div class="submenu submenu-fixed" v-if="scrolled > 250">
+			<ul class="submenu-list">
+				<li class="desktop-only"><b>{{ name }}</b></li>
+				<li class="desktop-only">&mdash;</li>
+				<li><a href="#prehled">Přehled</a></li>
+				<li v-if="$store.state.selectedRegion.results.length > 0"><a href="#vysledky"><span class="desktop-only" v-if="$store.state.votingDisplay === true">Tipy a </span>Hlasování</a><small> &middot; {{ $store.state.selectedRegion.count }} lidí</small></li>
+				<li><a href="#odhady">Odhady</a></li>
+			</ul>
+		</div>
+		<div class="block block-results" v-if="representatives.META.UCAST > 0">
+			<table cellpadding="0" cellspacing="0" class="table-results">
+				<tr v-for="(program, index) in representatives.VOLEBNI_STRANA" :class="{gains: program.ZASTUPITEL.length > 0}">
+					<td class="table-results-graph">
+						<div class="voting-holder">
+							<span class="voting-results-graph" v-if="$store.state.votingDisplay === true" :style="{width: program.META.HLASY_PROC + '%' }"></span>
+						</div>
+					</td>
+					<td class="table-results-pct">
+						<small :title="program.META.HLASY + ' hlasů'">{{ program.META.HLASY_PROC }} %</small>
+					</td>
+					<td class="table-results-name">
+						<h3>
+							{{ code(program.META.NAZEV_STRANY) }}
+						</h3>
+					</td>
+					<td class="table-results-count">
+						<template v-if="Number(program.META.ZASTUPITELE_POCET) > 0">
+							<strong>{{ program.META.ZASTUPITELE_POCET }}</strong> <small>zast.</small>
+						</template>
+					</td>
+				</tr>
+			</table>
+		</div>
+		<div class="block block-representatives" v-if="representatives.META.UCAST > 0">
+			<h2>Zvolení zastupitelé</h2>
+			<ul class="list-of-representatives">
+				<template v-for="(program, index) in representatives.VOLEBNI_STRANA">
+					<li v-if="program.ZASTUPITEL.length > 0">
+						
+						<div class="party-of-representatives">
+							<h4>{{ code(program.META.NAZEV_STRANY) }}</h4>
+							<ol class="list-of-party-representatives">
+								<li v-for="(repre, index2) in program.ZASTUPITEL">
+									<div class="party-representative">
+										<small v-if="repre.TITULPRED != ''">
+											{{ repre.TITULPRED }}
+										</small>
+										{{ repre.JMENO }}
+										{{ repre.PRIJMENI }}<small v-if="repre.TITULZA != ''">,
+											{{ repre.TITULZA }}
+										</small>
+									</div>
+								</li>
+							</ol>
+						</div>
+					</li>
+				</template>
+			</ul>
+		</div>
+		<div class="block">
+			<div class="help" v-if="votedInRegion === false && $store.state.votingEnabled">
+				<img src="/static/icon/who.svg" alt="Tipněte si, kdo vyhraje" class="who" v-if="programsSorted.length > 1">
+			</div>
+			<table cellpadding="0" cellspacing="0" class="table-programs">
+				<tr v-for="(program, index) in programsSorted">
+					<td>
+						<h3 :class="{rerun: program.OBHAJUJE === 1}">
+							<router-link :to="'/kandidat/' + program.HASH" :title="program.NAZEV">
+								{{ program.NAZEV }}
+							</router-link>
+						</h3>
+						<p class="program-meta">
+							{{ program.LIDR }} <small>/ lídr</small>
+							<template v-if="votes(program).count > -1 && $store.state.selectedRegion.results.length > 0">
+								<br>
+								<small class="desktop-only">
+									{{ votes(program).percentage }} % hlasů
+									&middot;
+									tipuje na vítěze {{ tips(program).percentage }} % lidí
+								</small>
+							</template>
+						</p>
+						<div class="program-graph" v-if="tips(program).count > 0">
+							<span class="program-graph-votes" :style="{width: ((votes(program).percentage > 50 ? 50 : votes(program).percentage) * .9) + '%'}" v-if="votes(program).count > 0"></span>
+							<span class="program-graph-tips" :style="{width: ((tips(program).percentage > 50 ? 50 : tips(program).percentage) * .9) + '%'}" v-if="tips(program).count > 0"></span>
+						</div>
+						
+						<blockquote v-if="program.HESLO.length > 0">{{ program.HESLO }}</blockquote>
+					</td>
+					<td class="actions">
+						<div class="social">
+							<div class="icon icon-missing" v-if="program.ODKAZ_PROGRAM.length === 0">
+								<a :href="'/kandidat/' + program.HASH + '/form'" title="doplnit program">
+									<img src="/static/icon/www.svg" alt="program online">
+									<span>Doplnit</span>
+								</a>
+							</div>
+							<div class="icon icon-missing" v-if="program.FB.length === 0">
+								<a :href="'/kandidat/' + program.HASH + '/form'" title="doplnit FB profil">
+									<img src="/static/icon/fb.svg" alt="FB stránka">
+									<span>Doplnit</span>
+								</a>
+							</div>
+							<div class="icon icon-missing" v-if="program.TW.length === 0">
+								<a :href="'/kandidat/' + program.HASH + '/form'" title="doplnit twitter">
+									<img src="/static/icon/tw.svg" alt="twitter">
+									<span>Doplnit</span>
+								</a>
+							</div>
+							<div class="icon" v-if="program.ODKAZ_PROGRAM.length > 0">
+								<a :href="program.ODKAZ_PROGRAM" target="_blank" @click="outbound('www', program)" title="program online">
+									<img src="/static/icon/www.svg" alt="program online">
+									<span>Program</span>
+								</a>
+							</div>
+							<div class="icon" v-if="program.FB.length > 0">
+								<a :href="program.FB" target="_blank" @click="outbound('fb', program)" title="profil na Facebooku">
+									<img src="/static/icon/fb.svg" alt="profil na Facebooku">
+									<span>FB Profil</span>
+								</a>
+							</div>
+							<div class="icon" v-if="program.TW.length > 0">
+								<a :href="program.TW" target="_blank" @click="outbound('tw', program)" title="účet na Twitteru">
+									<img src="/static/icon/tw.svg" alt="účet na Twitteru">
+									<span>Twitter</span>
+								</a>
+							</div>
+							<div class="icon">
+								<router-link :to="'/kandidat/' + program.HASH + '#lide'" title="kandidátní listina">
+									<img src="/static/icon/list.svg" alt="kandidátní listina">
+									<span>Kandidáti</span>
+								</router-link>
+							</div>
+							<div class="actions-vote" v-if="$store.state.votingEnabled === true">
+								<em class="middot">&middot;</em>
+								<vote-icon :type="'tip'" :region="program.ID_ZASTUP" :candidate="program.ID" :verbose="false" :link="'kandidat/' + program.HASH" v-if="programsSorted.length > 1"></vote-icon>
+								<vote-icon :type="'vote'" :region="program.ID_ZASTUP" :candidate="program.ID" :verbose="false" :link="'kandidat/' + program.HASH"></vote-icon>
+							</div>
+							
+						</div>
+						
+					</td>
+				</tr>
+			</table>
+		</div>
+		<!--
+		<div class="block block-overview" v-if="$store.state.votingDisplay === true">
+			<h2>Sčítání hlasů</h2>
+			<div class="irozhlas-widget" id="widgetFromIRozhlas"></div>
+		</div>
+		-->
+		<div class="block block-help" v-if="$store.state.votingDisplay === false">
+			<h2>Narazili jste na <span class="red">chybu</span>? Nebo chcete něco <span class="red">doplnit</span>?</h2>
+			<p>Můžete se s námi spojit na <a href="https://facebook.com/programydovoleb" target="_blank"><b>Facebooku</b></a> nebo <a href="https://twitter.com/programydovoleb" target="_blank"><b>Twitteru</b></a>. Pokud máte radši email, posílejte prosím na <a href="mailto:info@programydovoleb.cz"><b>info@programydovoleb.cz</b></a>. Můžete také využít formulář, který je dostupný v&nbsp;detailu každého kandidáta.</p>
+		</div>
+		<div class="block" v-if="programsSorted.length > 1 && $store.state.votingEnabled === true">
+			<img src="/static/icon/tip-selected.svg" alt="" class="desktop-only visual">
+			<h2>Tipněte si, kdo získá nejvíc hlasů </h2>
+			<p class="dynamic-paragraph">
+				V každém městě a obci si můžete <b>tipnout</b>, kdo získá nejvíc hlasů. <br>
+				Bez ohledu na vaše volební preference si tak můžete zkusit tipnout, zda trefíte vítěze voleb v libovolném městě nebo obci České republiky. Počet tipů není nijak omezen.
+				Výsledky se zobrazí, jakmile své hlasy a tipy odevzdá alespoň {{ $store.state.selectedRegion.limit }} lidí.
+				<template v-if="$store.state.selectedRegion.results.length > 0">
+					<br><strong>Vítěze si tiplo {{ $store.state.selectedRegion.countTips }} lidí.</strong>
+				</template>
+			</p>
+			<ul class="btns">
+				<li>
+					<router-link :to="'/misto/' + hash + '/prubezne-vysledky-tipovani'" class="button">Zobrazit průběžné výsledky</router-link>
+				</li>
+				<li>
+					<a :href="'http://www.facebook.com/sharer/sharer.php?u=' + encodeURI(link)" class="button button-secondary" target="_blank" @click="sharebound">Pozvat přátele z Facebooku, ať také tipují</a>
+				</li>
+			</ul>
+		</div>
+		<div class="block" v-if="$store.state.votingEnabled === true">
+			<img src="/static/icon/vote-selected.svg" alt="" class="desktop-only visual">
+			<h2>Vyjádřete svou podporu</h2>
+			<p class="dynamic-paragraph">
+				<b>Hlasujte</b> nanečisto pro svého favorita. <br>
+				Hlasovat můžete pouze v jednom městě nebo obci v rámci celé republiky. <br>
+				Jakmile dáte hlas někomu jinému, původní hlas bude zrušen.<br>
+				Výsledky se zobrazí, jakmile své hlasy a tipy odevzdá alespoň {{ $store.state.selectedRegion.limit }} lidí.
+				<template v-if="$store.state.selectedRegion.results.length > 0">
+					<br><strong>Hlasovalo již {{ $store.state.selectedRegion.countVotes }} lidí.</strong>
+				</template>
+			</p>
+			<ul class="btns">
+				<li>
+					<router-link :to="'/misto/' + hash + '/prubezne-vysledky-hlasovani'" class="button">Zobrazit průběžné výsledky</router-link>
+				</li>
+				<li>
+					<a :href="'http://www.facebook.com/sharer/sharer.php?u=' + encodeURI(link)" class="button button-secondary" target="_blank" @click="sharebound">Pozvat přátele z Facebooku, ať také hlasují</a>
+				</li>
+			</ul>
+			<a name="odhady"></a>
+		</div>
+		<div class="block" v-if="$store.state.votingEnabled === false">
+			<img src="/static/icon/vote-selected.svg" alt="" class="desktop-only visual">
+			<a name="vysledky"></a>
+			<h2>Hlasování a tipování je ukončeno</h2>
+			<p>V období od 1. září do 1. října bylo možné na webu tipovat, která strana nebo hnutí v libovolném městě nebo obci ČR získá nejvíc hlasů. Zároveň bylo možné vyjádřit svoji podporu, přičemž pro celé volby bylo možné hlasovat jen jednou.</p>
+			<p>Hlasování bylo anonymní a nejednalo se o ucelený metodický průzkum, který by splňoval náročná kritéria, a nebylo to ani účelem tohoto webu. S ohledem na malá množství tipujících/hlasujících je nutné brát výsledky opravdu s rezervou.</p>
+			<p>
+				<template v-if="$store.state.selectedRegion.results.length > 0">
+					<br>
+					<strong>Hlasovalo {{ $store.state.selectedRegion.countVotes }} lidí.</strong>
+					<strong>Vítěze si tiplo {{ $store.state.selectedRegion.countTips }} lidí.</strong>
+				</template>
+				<template v-if="$store.state.selectedRegion.results.length === 0">
+					<br>Hlasování se zúčastnilo velmi málo lidí.
+				</template>
+			</p>
+			<ul class="btns" v-if="$store.state.selectedRegion.results.length > 0">
+				<li>
+					<router-link :to="'/misto/' + hash + '/prubezne-vysledky-hlasovani'" class="button">Zobrazit výsledky hlasování</router-link>
+				</li>
+				<li>
+					<router-link :to="'/misto/' + hash + '/prubezne-vysledky-tipovani'" class="button">Zobrazit výsledky tipování</router-link>
+				</li>
+			</ul>
+			<a name="odhady"></a>
+		</div>
+		<div class="block" v-if="programsSorted.length > 1">
+			<img src="/static/icon/icon-guess.svg" alt="" class="desktop-only visual">
+			<h2>Expertní odhad</h2>
+			<template v-if="$store.state.votingEnabled === true">
+				<p>Staňte se politickým expertem a odhadněte celkové výsledky. Vyzkoušejte si, jak dobře znáte poměry a politiky a zda se dokážete trefit do voličů, kteří půjdou 5. a 6. října odevzdat svůj hlas.</p>
+				<ul class="btns">
+					<router-link :to="'/misto/' + hash + '/novy-odhad'" class="button">Vytvořit expertní odhad</router-link>
+				</ul>
+			</template>
+			<template v-if="$store.state.votingEnabled === false">
+				<p>Do 1. října bylo možné vedle hlasování a tipování, aby si návštěstníci webu tipnuli, jaké budou konkrétní procentuální zisky, a kdo poté vytvoří koalici. Expertní odhady nejsou vloženy z jiného webu nebo výzkumu, všechny byly takto anonymně uloženy návštěvníky webu. V dohledné době budou všechny odkady vyhodnoceny s ohledem na výsledky voleb.</p>
+				<br>
+			</template>
+			<template v-if="$store.state.selectedRegion.guess.length > 0">
+				<h3>Odhady expertů</h3>
+				<ul class="guess-list">
+					<li v-for="(guess, index) in $store.state.selectedRegion.guess.filter(item => item.ID_ZASTUP === region.ID_ZASTUPITELSTVO)">
+						<div class="guess-item">
+							<h4>
+								<router-link :to="'/misto/' + hash + '/odhad/' + guess.HASH">
+									{{ guess.NAME.length > 0 ? guess.NAME : "Nepojmenovaný odhad" }}
+								</router-link>
+							</h4>
+							<p v-if="coalition(guess).percentage > 0"><small>Koalice {{ coalition(guess).percentage}} %: {{ coalition(guess).members.join(", ") }}</small></p>
+						</div>
+					</li>
+				</ul>
+			</template>
+		</div>
+		<div class="block" v-if="programsSorted.length === 1">
+			<img src="/static/icon/tip-selected.svg" alt="" class="desktop-only visual">
+			<h2>Kde je tipování a expertní odhad?</h2>
+			<p>Protože {{ name }} postavila jen jednu kandidátku, můžeme směle odhadnout, že vítězná strana je jasná. Můžete se ale stále podívat na kandidátku, případně se podívat, jaká pravidla pro hlasování platí právě u vás. Tipovat můžete samozřejmě v jiných městech a obcích. Váš hlas zde můžete ale odevzdat</p>
+			<ul class="btns">
+				<li>
+					<router-link to="'/kandidat/' + programsSorted[0].HASH" class="button">Zobrazit kandidátku {{ programsSorted[0].CODE }}</router-link>
+				</li>
+			</ul>
+		</div>
+		<div class="block info">
+			<img src="/static/icon/logo-volby.svg" alt="" class="desktop-only visual visual-no-border">
+			<h2>{{ name }} volí <span class="blue">{{ region.ZASTUPITELU }} zastupitelů</span></h2>
+			<p>5. a 6. října půjdeme k volbám do zastupitelstev města o obcí a rozhodneme o podobě komunální politiky na další čtyři roky. Volby do komunálu mají svá specifika a je lepší si je pročíst, než zbytečně přijít o hlas. Ten totiž není jediný, ale každý jich má tolik, kolik je zastupitelských míst. {{ name }} jich má {{ region.ZASTUPITELU}}, proto pokud zde bydlíte a půjdete volit, máte <strong>{{ region.ZASTUPITELU }} hlasů ve volbách</strong>.</p>
+			<h2 class="red"><span class="red is-link" @click="toggle(1)">Jak mohu hlasovat 5. a 6. října?</span></h2>
+			<div class="collapsible" v-if="show1">
+				<h3>Chci dát všechny své hlasy jedné straně:</h3>
+				<p>Nejjednoduší varianta je dát křížek celé straně. Poté strana dostane váš plný počet hlasů, tedy {{ region.ZASTUPITELU }}. Hlasy se přidělí podle pořadí na kandidátce.</p>
+				<h3>Chci hlasy rozdělit mezi více stran strany:</h3>
+				<p>V tomto případě nedáváte velký křížek jedné straně, ale označujete jednotlivé kandidáty z více stran. Počet křížků by měl odpovídat počtu vašich hlasů, aby žádný zbytečně nepropadl.</p>
+				<h3>Chci si z jedné kandidátky vybrat pár lidí a zbytek hlasů dát jiné straně:</h3>
+				<p>I tohle je možné. Zaškrtejte, kdo se vám z kandidátky líbí a pak vyberte další stranu, a té dejte velký křížek. Vaše hlasy pak budou započítány tak, že nejdřív se rozdají vaši preferovaní kandidáti, a co zbyde, se dá straně. Z {{ region.ZASTUPITELU }} hlasů tak můžete např {{ Math.floor(Number(region.ZASTUPITELU) / 3) }} přidělit různým osobnostem, a pro zbytek hlasů vybrat jednu ze stran.</p>
+			</div>
+			<h2 class="red"><span class="red is-link" @click="toggle(2)">Jak se hlasy počítají?</span></h2>
+			<div class="collapsible collapsible-2" v-show="show2">
+				<p>Počítání v komunálních volbách má dvě fáze. V první se zjišťují strany, které uspěly, a v druhé se určuje pořadí kandidátů. Popis prosím berte jako orientační.</p>
+				<h3>1. krok: strany</h3>
+				<p>V prvním kroku se posčítají všechny hlasy pro stranu a určí se, kolik hlasů získala ze všech odevzdaných. Když to je alespoň 5 %, dostává se do zastupitelstva. Přesný počet mandátů je určen pomocí d'Hontovy metody.</p>
+				<h3>2. krok: mandáty</h3>
+				<p>U stran, které se dostaly do zastupitelstva, se začne přihlížet k počtu preferenčních hlasů. Na rozdíl od parlamentních voleb se ale kandidáti neřadí pouze podle počtu obdržených hlasů. Jedinou možností je posun kandidáta na přední příčku a to jen v případě, že získá o 10 % a víc hlasů než je průměrný počet hlasů v dané straně. Ve velkých městech je tak nutné získat mnoho hlasů pro kandidáta, aby se posunul na první pozici. U malých obcí je to snažší.</p>
+				<h3>Chcete vědět víc?</h3>
+				<p><a href="https://www.youtube.com/watch?v=KVittZNl0H8" target="_blank">Podívejte se na video Otto Eibla a Miloše Gregora</a></p>
+				<p><a href="https://acpo.vedeckecasopisy.cz/publicFiles/00056.pdf" target="_blank">Přečtěte si pohled Tomáše Lebedy</a></p>
+				<p><a href="https://www.zakonyprolidi.cz/cs/2001-491" target="_blank">Podívejte se na znění zákona č. 491/2001 Sb.</a></p>
+				<p><a href="https://cs.wikipedia.org/wiki/Komun%C3%A1ln%C3%AD_volebn%C3%AD_syst%C3%A9m_v_%C4%8Cesk%C3%A9_republice" target="_blank">Základní přehled najdete i na Wikipedii</a></p>
+			</div>
+		</div>
+	</template>
+</div>
+

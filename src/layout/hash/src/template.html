@@ -1,0 +1,67 @@
+<div class="layout-hash">
+	<div class="ticket">
+		<h1>Hlasovací lístek</h1>
+		<template v-if="vote">
+			<div class="icon">
+				<img src="/static/icon/vote-selected.svg" alt="">
+			</div>
+			<h2>Hlas získal:</h2>
+			<h3>
+				<router-link :to="'/kandidat/' + vote.KANDIDAT.HASH">
+					<strong>{{ vote.KANDIDAT.NAZEV }}</strong>
+				</router-link>
+				<br>
+				<router-link :to="'/misto/' + vote.ZASTUPITELSTVO.HASH">
+					{{ vote.ZASTUPITELSTVO.NAZEVZAST }}
+				</router-link>
+			</h3>
+		</template>
+		<template v-if="tips.length > 0">
+			<div class="icon">
+				<img src="/static/icon/tip-selected.svg" alt="">
+			</div>
+			<h2>Tipy na vítěze:</h2>
+			<div class="tip" v-for="(tip, index) in tipsSorted">
+				<router-link :to="'/kandidat/' + tip.KANDIDAT.HASH">
+					<strong>{{ tip.KANDIDAT.NAZEV }}</strong>
+				</router-link>
+				<span>&middot;</span>
+				<router-link :to="'/misto/' + tip.ZASTUPITELSTVO.HASH">
+					{{ tip.ZASTUPITELSTVO.NAZEVZAST }}
+				</router-link>
+			</div>
+		</template>
+		<div class="permalink">
+			<h2>Sdílejte</h2>
+			<div class="social">
+				<div class="icon-social">
+					<a :href="'http://www.facebook.com/sharer/sharer.php?u=' + encodeURI(link())" target="_blank" @click="outbound('fb')">
+						<img src="/static/icon/fb.svg" alt="sdílet na Facebooku">
+						<span>sdílet</span>
+					</a>
+				</div>
+				<div class="icon-social">
+					<a :href="'http://twitter.com/share?text=' + encodeURI(title) + '&url=' + encodeURI(link() + '&via=programydovoleb')" target="_blank" @click="outbound('tw', image)">
+						<img src="/static/icon/tw.svg" alt="účet na Twitteru">
+						<span>tweetnout</span>
+					</a>
+				</div>
+			</div>
+			<p>Nebo zkopírujte odkaz z okna prohlížeče.</p>
+		</div>
+	</div>
+	<div class="join" v-if="$store.state.votes.hash === ''">
+		<h3>Chcete také hlasovat?</h3>
+		<p>Jednoduše. Vyberte si libovolné <router-link to="/">město nebo obec</router-link> a klikněte na ikonu hlasování nebo tipování. Vygeneruje se vám tajné heslo, díky kterému se budete moct k hlasování kdykoli vrátit. A také stránka, podobná této, kde bude přehled vašich hlasů.</p>
+		<div class="join-action">
+			<router-link to="/hlasovani" class="button">Jak na to?</router-link>
+			<router-link to="/" class="button button-secondary">Začněte zde</router-link>
+		</div>
+	</div>
+	<div class="join" v-if="$store.state.votes.hash != ''">
+		<h3>Sdílejte vaše tipy s kamarády</h3>
+		<p>Odkaz na tuto stránku můžete zkopírovat klidně na Facebook, Twitter, do Skypu nebo poslat emailem. A kdybyste časem tipovali další výsledky, váš ticket se bude měnit také. Důležité je si uchovat <strong>hlasovací kód</strong>. Ten váš je <strong class="red">{{ $store.state.votes.hash }}</strong>. Když si vymažete cookies, nebo otevřete web na novém zařízení, bez něj se ke svým původním tipům nedostanete.</p>
+		<div class="join-action"><router-link to="/" class="button">Zpět na úvodní stránku</router-link></div>
+	</div>
+</div>
+

@@ -1,0 +1,16 @@
+<div class="layout-detail" v-if="$store.state.enum.length > 0">
+	<h1>Kde se letos volí?</h1>
+	<ul>
+		<li v-for="(result, index) in list">
+			<div class="result">
+				<h3>
+					<router-link :to="'/obvod/' + result.HASH" v-html="result.OBVOD_NAZEV"></router-link>
+				</h3>
+			</div>
+		</li>
+	</ul>
+	<h1>
+		<router-link to="/kandidati">Abecední seznam kandidátů</router-link>
+	</h1>
+</div>
+

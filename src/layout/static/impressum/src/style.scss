@@ -1,0 +1,27 @@
+blockquote {
+	font-family: serif;
+    font-style: italic;
+    font-size: 1.25rem;
+    padding: .25em 0 .1em .5em;
+    margin: 0;
+}
+
+ul {
+	margin: 0;
+	padding: 0; 
+}
+
+blockquote,
+p {
+	margin: 0 0 2rem 0;
+	line-height: 1.5;
+}
+
+h2 {
+	margin-top: 4rem;
+}
+
+.layout-static-impressum {
+	max-width: 40rem;
+	margin: auto;
+}

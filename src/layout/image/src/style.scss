@@ -1,0 +1,55 @@
+.layout-image {
+	max-width: 40rem;
+	margin: auto;
+}
+
+img {
+	display: block;
+	width: 100%;
+	height: auto;
+}
+
+h1 {
+	margin-top: 3rem;
+}
+
+h2 {
+	margin: 3rem 0 0;
+}
+
+.actions {
+	margin-top: 1rem;
+}
+
+.no-border {
+	border-bottom: none;
+}
+
+.list {
+	margin: .5rem 0 -.5rem;
+}
+
+ul {
+
+	@media (min-width: 30rem) {
+		display: flex;
+		flex-wrap: wrap;
+
+		li {
+			width: 50%;
+		}
+	}
+}
+
+.list-item {
+	padding: .5rem;
+	text-align: center;
+}
+
+h4 {
+	margin: .5rem 0;
+}
+
+.actions {
+	font-size: .84rem;
+}

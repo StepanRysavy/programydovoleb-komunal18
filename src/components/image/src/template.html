@@ -1,0 +1,21 @@
+<div class="image">
+	<router-link :to="'/infografika/' + image.HASH" class="no-border">
+		<img :src="'https://komunal18.programydovoleb.cz/files/' + image.IMG" :alt="image.TITLE">
+	</router-link>
+	<h4>
+		{{ image.TITLE}}
+	</h4>
+	<span class="actions">
+		<router-link :to="'/infografika/' + image.HASH">
+			zvětšit
+		</router-link>
+		&middot;
+		<a :href="'http://www.facebook.com/sharer/sharer.php?u=' + encodeURI(link(image.HASH))" target="_blank" @click="outbound('fb', image)">
+			sdílet
+		</a>
+		&middot;
+		<a :href="'http://twitter.com/share?text=' + encodeURI(image.TITLE) + '&url=' + encodeURI(link(image.HASH) + '&via=programydovoleb')" target="_blank" @click="outbound('tw', image)">
+			tweetnout
+		</a>
+	</span>
+</div>

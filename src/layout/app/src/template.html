@@ -1,0 +1,91 @@
+<div id="app" :class="{page: $route.path != '/'}">
+	<div class="header">
+		<div class="content">
+			<h1>
+				<router-link to="/">
+					<img src="/static/logo.png" alt="Programy stran a hnutí pro komunální volby 5. a 6. října 2018">
+				</router-link>
+			</h1>
+			<div class="search">
+				<input type="text" v-model="$store.state.search" class="input" placeholder="Hledat město nebo obec">
+				<img src="/static/icon/detail.svg" alt="" class="icon-loupe">
+			</div>	
+			<div class="results-holder" v-if="sorted.length > 0">
+				<ul class="results">
+					<li v-for="(result, index) in sorted">
+						<div class="result">
+							<h3>
+								<router-link :to="'/misto/' + result.HASH" v-html="result.NAZEVZAST"></router-link>
+							</h3>
+							<p v-if="$store.state.enum.length > 0">
+								<small v-html="$store.state.enum.find(item => item.NUMNUTS === result.ID_OKRES).NAZEVNUTS"></small>
+							</p>				
+						</div>
+					</li>
+				</ul>
+			</div>
+		</div>
+	</div>
+	<div class="main">
+		<div class="content">
+		    <router-view></router-view> 
+		</div>
+	</div>
+	<div class="footer">
+		<div class="content">
+			<ul class="footer-info">
+				<li v-if="$store.state.votes.hash != ''">
+					<h4>Hlasování</h4>
+					<br>
+		    		<p><router-link :to="'/hlasovani/' + $store.state.votes.view" tag="button" class="button-secondary">Jak jste hlasovali?</router-link></p>
+		    		<h4>Váš hlasovací kód</h4>
+		    		<h1 class="red">{{ $store.state.votes.hash }}</h1>
+		    		<p><small>Zapiště si ho, pokud se budete chtít k hlasování vrátit</small></p>
+				</li>
+				<li>
+					<h4>Programy do voleb</h4>
+					<br>
+			    	<p><small>Web vytvořil <a href="https://www.twitter.com/stepanrysavy" target="_blank">@stepanrysavy</a>. Číselníky a kandidátky z <a href="https://www.czso.cz/csu/czso/podminky_pro_vyuzivani_a_dalsi_zverejnovani_statistickych_udaju_csu" target="_blank">otevřených dat ČSÚ</a>. Jednotlivé odkazy doporučují lidé, zaslané odkazy kontrolujeme.</small></p>
+				</li>
+				<li>
+					<h4>Komunální volby</h4>
+					<br>
+					<ul class="footer-menu">
+						<li><router-link to="/impressum">Co je tohle za web?</router-link></li>
+						<li><router-link to="/hlasovani">O hlasování</router-link></li>
+						<li><router-link to="/cookies">Prohlášení o cookies</router-link></li>
+						<li><router-link to="/infografika">Grafy a vizuály</router-link></li>
+						<li><a href="https://www.programydovoleb.cz" target="_blank">Programy do voleb</a></li>
+						<li><a href="https://senat18.programydovoleb.cz" target="_blank">Senátní volby</a></li>
+					</ul>
+				</li>
+				<li>
+			    	<h4>Kde nás najdete:</h4>
+			    	<br>
+					<div class="social-share">
+						<div class="icon-social">
+							<a href="https://www.facebook.com/programydovoleb" target="_blank" @click="outbound('fb')">
+								<img src="/static/icon/fb.svg" alt="sdílet na Facebooku">
+							</a>
+						</div>
+						<div class="icon-social">
+							<a href="https://www.twitter.com/programydovoleb" target="_blank" @click="outbound('tw')">
+								<img src="/static/icon/tw.svg" alt="účet na Twitteru">
+							</a>
+						</div>
+					</div>
+					<h4>Napište nám:</h4>
+					<p><small><a mailto="info@programydovoleb.cz">info@programydovoleb.cz</a></small></p>
+				</li>
+			</ul>
+		</div>
+	</div>
+	<div class="footer">
+		<div class="content">
+			<a href="https://www.programydovoleb.cz" target="_blank">
+				<img src="/static/logo-global.png" alt="" class="logo-global">
+			</a>
+		</div>
+	</div>
+	<vote-modal v-if="$store.state.votes.modal.show === true"></vote-modal>
+</div>

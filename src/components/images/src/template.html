@@ -1,0 +1,8 @@
+<div class="list-of-images">
+	<ul class="list" :class="{'columns-3': columns === 3}">
+		<li v-for="(image, index) in list">
+			<image-detail :image="image"></image-detail>
+		</li>
+	</ul>
+</div>
+

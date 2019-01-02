@@ -1,0 +1,23 @@
+<div class="layout-detail" v-if="$store.state.enum.length > 0">
+	<h1>Kdo kandiduje?</h1>
+	<p><strong>Červeně</strong> označení kandidáti obhajují svůj mandát</p>
+	<ul class="alphabet">
+		<li v-for="(result, index) in $store.state.listOfCandidates">
+			<h3 v-if="(index === 0 || (index > 0 && $store.state.listOfCandidates[index].HASH.charAt(0) != $store.state.listOfCandidates[index - 1].HASH.charAt(0))) && $store.state.listOfCandidates[index].HASH.charAt(0) != 'Ť' && (index > 1 && $store.state.listOfCandidates[index - 1].HASH.charAt(0) != 'Ť')">
+				{{ result.HASH.charAt(0).toUpperCase() }}{{ ch(result.HASH) === true ? "h" : ""}}
+			</h3>
+			<h3 v-if="index === 0">
+				{{ result.HASH.charAt(0).toUpperCase() }}
+			</h3>
+			<div class="result">
+				<h4 :class="{rerun: result.OBHAJUJE === 1}">
+					<router-link :to="'/kandidat/' + result.HASH" v-html="result.CELEJMENO"></router-link>
+				</h4>	
+			</div>
+		</li>
+	</ul>
+	<h1>
+		<router-link to="/obvody">V kterých obvodech se letos volí?</router-link>
+	</h1>
+</div>
+

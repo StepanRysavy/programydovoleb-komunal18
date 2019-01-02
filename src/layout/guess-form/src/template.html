@@ -1,0 +1,76 @@
+<div class="guess-form">
+	<template v-if="loading || $store.state.selectedRegion.data === null">
+		<div class="loading">
+			Načítám ...
+		</div>
+	</template>
+	<template v-if="!loading && $store.state.selectedRegion.data != null && $store.state.votingEnabled === true"> 
+		<h2>Jaký odhadujete výsledek voleb?</h2>
+		<h1>{{ name }}</h1>
+		<p><small>Okres {{ area }} / {{ druh }}</small></p>
+		<template v-if="guess.length > 0">
+			<div class="center">
+				<p class="warn-small" v-if="suma > 9">Počet procent k dispozici: {{ suma }} %</p>
+				<p class="warn-small" v-if="suma < 10 && suma > 0">Už jen pár procent: {{ suma }} %</p>
+				<p class="warn-happy" v-if="valid === true"><b>Můžete uložit.</b></p>
+				<p class="warn-small" v-if="valid === true && coalition.percentage === 0">Můžete ještě zaškrtnout, kdo sestaví koalici.</p>
+				<p class="warn-small" v-if="valid === true && coalition.percentage > 0 && coalition.percentage < 50">Vybraná koalice má zatím jen {{ coalition.percentage }} %</p>
+				<p class="warn-happy" v-if="valid === true && coalition.percentage > 49">Koalice má {{ coalition.percentage }} %.</p>
+				<p class="warn-big" v-if="valid === false && suma === 0"><b>Chyba.</b> Prosím zkontrolujte zadané údaje.</p>
+				<p class="warn-big" v-if="suma < 0"><b>Pozor.</b> Součet procent nemůže být větší jak 100.</p>
+			</div>
+			<div class="center">
+				<span class="is-link" @click="sortByVotes">seřadit</span>
+				<span v-if="suma != 0 && suma != 100">
+				 	&middot; 
+				 	<span class="is-link" @click="calculate">dopočítat</span>
+				</span>
+				<span v-if="valid">
+					&middot;
+					<span class="is-link" @click="handleClick_hideZero">
+						{{ hideZero === true ? "zobrazit všechny" : "skrýt neúspěšné" }}
+					</span>
+				</span>
+			</div>
+			<table cellpadding="0" cellspacing="0" :class="{err: suma < 0}">
+				<tr v-for="(result, index) in guess" v-if="!valid || hideZero === false || (valid === true && result.percentage > 0 && hideZero === true)">
+					<td class="graph">
+						<div class="graph-move">
+							<span class="program-graph" :style="{width: ((result.percentage < 101 ? result.percentage : 100) / 2) + '%'}" v-if="result.percentage > 0"></span>
+						</div>
+					</td>
+					<td class="guess">
+						<input class="guess-number input" type="number" v-model:number="result.percentage" :class="{invalid: result.percentage < 0 || result.percentage > 100}"> <small>%</small>
+					</td>
+					<td class="coalition">
+						<input type="checkbox" v-model="result.coalition" :disabled="!(result.percentage > 4 && valid)" title="přidat/odebrat do koalice">
+					</td>
+					<th class="program" :class="{out: result.percentage < 5}">
+						<h3 v-if="result.data">
+							<span class="a-name">{{ result.data.NAZEV }}</span>
+						</h3>
+					</th>
+					<td></td>
+				</tr>
+			</table>
+			<div class="actions center guess-title">
+				<input type="text" v-model="title" placeholder="Pojmenujte svůj odhad" class="input title" :class="{invalid: title.length > 30}">
+				<small>{{ title.length }}/30</small>
+			</div>
+			<div class="actions center">
+					<button :disabled="!valid" @click="handleClick_submit">Uložit odhad</button>
+			</div>
+			<p class="actions">
+				<router-link :to="'/misto/' + hash">Přejít na výpis kandidátů</router-link>
+			</p>
+		</template>
+	</template>
+	<template v-if="$store.state.votingEnabled === false">
+		<h2>Již není možné vkládat odhady</h2>
+		<p>V souhlasu se zákonem není možné vytvářet a zveřejňovat nové odhady 3 dny před začátkem voleb.</p>
+			<p class="actions">
+				<router-link :to="'/misto/' + hash">Přejít na výpis kandidátů</router-link>
+			</p>
+	</template>
+</div>
+

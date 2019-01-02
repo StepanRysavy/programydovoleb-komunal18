@@ -1,0 +1,74 @@
+<div class="layout-detail">
+	<template v-if="$store.state.selectedRegion.data === null">
+		<div class="loading">
+			Načítám ...
+		</div>
+	</template>
+	<template v-if="$store.state.selectedRegion.data != null">
+		<template v-if="guessItem && guessItem.NAME.length > 0">
+			<h2>{{ guessItem.NAME }}</h2>
+			<p><small>Odhad výsledků voleb</small></p>
+		</template>
+		<template v-if="!guessItem || (guessItem && guessItem.NAME.length === 0)">
+			<h2>Odhad výsledků voleb</h2>
+		</template>
+		<h1>{{ name }}</h1>
+		<p><small>Okres {{ area }} / {{ druh }}</small></p>
+		<template v-if="results.length > 0">
+			<table cellpadding="0" cellspacing="0">
+				<tr v-for="(result, index) in results" :class="{out: result.percentage < 5}" v-if="result.percentage > 0">
+					<td class="graph">
+						<div class="graph-move">
+							<span class="program-graph" :style="{width: (result.percentage) + '%'}" v-if="result.percentage > 0"></span>
+						</div>
+					</td>
+					<td class="graph-percent">
+						<small>
+							{{ result.percentage }} %
+						</small>
+						<img src="/static/icon/vote-check.svg" class="check" v-if="coalition.members.length > 0 && inCoalition(result) === true">
+					</td>
+					<td class="graph-name program">
+						<h3 v-if="result.data">
+							<router-link :to="'/kandidat/' + result.data.HASH" :title="result.data.NAZEV">
+								{{ result.data.NAZEV }}
+							</router-link>
+						</h3>
+						<div class="graph-move">
+							<div class="program-graph" :style="{width: (result.percentage) + '%'}" v-if="result.percentage > -1"></div>
+						</div>
+					</td>
+					<td></td>
+				</tr>
+			</table>
+			<div class="coalition" v-if="coalition.members.length > 0">
+				<h2>Tip na koalici</h2>
+				<p class="coalition-description">{{ coalition.members.join(", ") }}</p>
+				<p><small>Síla koalice: {{ coalition.percentage }} %</small></p>
+			</div>
+			<div class="permalink center" v-if="guessItem.WHO === $store.state.votes.hash">
+				<div class="social">
+					<div class="icon-social">
+						<a :href="'http://www.facebook.com/sharer/sharer.php?u=' + encodeURI(link)" target="_blank" @click="outbound('fb')">
+							<img src="/static/icon/fb.svg" alt="sdílet na Facebooku">
+							<span>sdílet</span>
+						</a>
+					</div>
+					<div class="icon-social">
+						<a :href="'http://twitter.com/share?text=' + encodeURI(guessItem.NAME + ' - odhad výsledků voleb: ' + name) + '&url=' + encodeURI(link + '&via=programydovoleb')" target="_blank" @click="outbound('tw', image)">
+							<img src="/static/icon/tw.svg" alt="účet na Twitteru">
+							<span>tweetnout</span>
+						</a>
+					</div>
+				</div>
+			</div>
+			<p class="actions" v-if="guessItem.WHO != $store.state.votes.hash && $store.state.votingEnabled === true">
+				<router-link :to="'/misto/' + hash + '/novy-odhad'" class="button">Chci vytvořit vlastní odhad</router-link>
+			</p>
+			<p class="actions">
+				<router-link :to="'/misto/' + hash">Přejít na výpis kandidátů</router-link>
+			</p>
+		</template>
+	</template>
+</div>
+

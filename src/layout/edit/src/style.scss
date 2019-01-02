@@ -1,0 +1,91 @@
+h1 {
+	margin: 0;
+}
+
+small {
+	font-size: 11px;
+	color: #aaa;
+}
+
+label {
+	font-size: .84rem;
+	font-weight: bold;
+	text-transform: uppercase;
+	width: 10rem;
+	display: inline-block;
+}
+
+input {
+	width: 100%;
+	display: block;
+	padding: .5em 1em;
+	font-size: 1rem;
+	margin: 1.5em 0;
+	border: 1px solid #acabef;
+
+	@media (min-width: 40rem) {
+		width: 20rem;
+		display: inline-block;
+		margin: 0;
+	}
+}
+
+h3 {
+	margin: 0;
+
+	@media (max-width: 45rem) {
+		margin-bottom: .5em;
+	}
+}
+
+td span {
+	display: none;
+}
+
+td a + span:not(:last-child) {
+	display: inline-block;
+}
+
+.add {
+	margin-top: 3rem;
+}
+
+.add-headline {
+	position: relative;
+
+	h1 {
+		margin-bottom: 2rem;
+	}
+}
+
+.add-headline .add-close {
+	position: absolute;
+	padding: .2em .5em;
+	top: 0;
+	right: 0;
+	font-size: 2rem;
+}
+
+.add-after .add-headline .add-close {
+	font-size: 1.5rem;
+	display: inline-block;
+	position: static;
+}
+
+.add-input {
+	margin-bottom: 1.5rem;
+	padding: 0 .5rem 0 0;
+
+	p {
+		display: none;
+	}
+}
+
+.add-input.sent {
+	input, button {
+		display: none;
+	}
+	p {
+		display: inline;
+	}
+}

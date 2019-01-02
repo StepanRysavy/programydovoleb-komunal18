@@ -1,0 +1,146 @@
+ul, li {
+	padding: 0;
+	margin: 0;
+	list-style: none;
+}
+
+ul {
+
+	@media (min-width: 30rem) {
+		columns: 2;
+	}
+
+	@media (min-width: 42rem) {
+		columns: 3;
+	}
+}
+
+li {
+	break-inside: avoid-column;
+	padding-bottom: .5em;
+}
+
+h2, h3, h4, p {
+	margin: 0;
+}
+
+h1 {
+	padding: 0 0 .25em;
+	max-width: 30rem;
+	margin: auto;
+}
+
+h1, p {
+	text-align: center;
+}
+
+h1 + p {
+	max-width: 30rem;
+	margin: auto;
+}
+
+h2 {
+	text-align: center;
+	padding: 0 0 2rem;
+}
+
+h4 {
+	font-size: 1.25rem;
+}
+
+.alphabet h3 {
+	margin: 1rem 0;
+}
+
+.alphabet li:first-child h3 {
+	margin-top: 0;
+}
+
+strong,
+.rerun a {
+	color: #D7141A;
+
+	&:hover {
+		border-bottom-color: #D7141A;
+	}
+}
+
+.search {
+	text-align: center;
+	max-width: 20rem;
+	margin: 0 auto;
+	position: relative;
+}
+
+.input {
+	font-size: 1.5rem;
+	width: 100%;
+	padding: .5em .5em;
+	border: none;
+	border-bottom: 2px solid #eee;
+	background: #fff;
+	text-align: center;
+
+	transition: border-color .5s, background 1s;
+
+	&:focus, &:hover {
+		border-bottom-color: #11457e;
+		outline: none;
+		background: #fafafa;
+	}
+
+	@media (max-width: 40rem) {
+		font-size: 1rem;
+	}
+}
+
+.icon-loupe {
+	display: none;
+
+	@media (min-width: 60rem) {
+		position: absolute;
+		display: block;
+		width: 3rem;
+		height: 3rem;
+		top: .4rem;
+		left: -2.75rem;
+		pointer-events: none;
+	}
+	
+}
+
+.results {
+	margin-top: 3rem;
+
+	p {
+		text-align: left;
+	}
+}
+
+.large-only {
+	display: none;
+
+	@media (min-width: 60rem) {
+		display: block;
+	}
+}
+
+.block.list-praha {
+	h2 {
+		padding-bottom: 0;
+	}
+}
+
+.desktop-only {
+	display: none;
+}
+
+@media (min-width: 30rem) {
+	.desktop-only {
+		display: block;
+	}
+
+	.mobile-only {
+		display: none;
+	}
+}

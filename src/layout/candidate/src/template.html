@@ -1,0 +1,164 @@
+<div class="layout-candidate" v-if="program">
+	<template v-if="loading || !program">
+		<div class="loading">
+			Načítám ...
+		</div>
+	</template>
+	<template v-if="!loading && program"> 
+		<div class="block block-intro">
+			<a name="prehled"></a>
+			<div class="breadcrumb">
+				<router-link :to="'/misto/' + region.HASH"><b>{{ region.NAZEVZAST }}</b></router-link><br><small>okres {{ area }}</small>
+			</div>
+			<div class="list">
+				<h1>{{ program.NAZEV }}</h1>
+				<blockquote v-if="program.HESLO.length > 0">{{ program.HESLO }}</blockquote>
+				<blockquote v-if="program.HESLO.length === 0" class="missing">
+					<a :href="'/kandidat/' + program.HASH + '/form'" title="doplnit volební motto">		
+						Doplnit motto
+					</a>
+				</blockquote>
+			</div>
+			<div class="social">
+				<div class="icon" v-if="program.ODKAZ_PROGRAM.length > 0">
+					<a :href="program.ODKAZ_PROGRAM" target="_blank" @click="outbound('www', program)" title="program online">
+						<img src="/static/icon/www.svg" alt="program online">
+						<span>program na webu</span>
+					</a>
+				</div>
+				<div class="icon" v-if="program.FB.length > 0">
+					<a :href="program.FB" target="_blank" @click="outbound('fb', program)" title="profil na Facebooku">
+						<img src="/static/icon/fb.svg" alt="profil na Facebooku">
+						<span>Facebook profil</span>
+					</a>
+				</div>
+				<div class="icon" v-if="program.TW.length > 0">
+					<a :href="program.TW" target="_blank" @click="outbound('tw', program)" title="účet na Twitteru">
+						<img src="/static/icon/tw.svg" alt="účet na Twitteru">
+						<span>twitter účet</span>
+					</a>
+				</div>
+				<div class="icon icon-missing" v-if="program.ODKAZ_PROGRAM.length === 0">
+					<a :href="'/kandidat/' + program.HASH + '/form'" title="doplnit program">
+						<img src="/static/icon/www.svg" alt="program online">
+						<span>Doplnit program</span>
+					</a>
+				</div>
+				<div class="icon icon-missing" v-if="program.FB.length === 0">
+					<a :href="'/kandidat/' + program.HASH + '/form'" title="doplnit FB profil">
+						<img src="/static/icon/fb.svg" alt="FB stránka">
+						<span>Doplnit Facebook</span>
+					</a>
+				</div>
+				<div class="icon icon-missing" v-if="program.TW.length === 0">
+					<a :href="'/kandidat/' + program.HASH + '/form'" title="doplnit twitter">
+						<img src="/static/icon/tw.svg" alt="twitter">
+						<span>Doplnit twitter</span>
+					</a>
+				</div>
+			</div>
+			<div v-if="$store.state.votingDisplay === false">
+				<router-link :to="'/kandidat/' + program.HASH + '/form'" class="button button-secondary">Upravit nebo doplnit údaje</router-link>
+			</div>
+			<a name="lide"></a>
+		</div>
+		<div class="block block-leader">
+			<h2>Lídr kandidátky</h2>
+			<p><strong>{{ program.LIDR }}</strong></p>
+			<p>{{program.LIDR_VEK}} let &middot; {{ program.LIDR_POVOLANI }}</p>			
+		</div>
+		<div class="block block-promo" v-if="$store.state.votingEnabled === true">
+			<div class="activity activity-highlighted">
+				<vote-icon :type="'tip'" :region="program.ID_ZASTUP" :candidate="program.ID" :verbose="true" :link="'kandidat/' + program.HASH"></vote-icon>
+				<vote-icon :type="'vote'" :region="program.ID_ZASTUP" :candidate="program.ID" :verbose="true" :link="'kandidat/' + program.HASH"></vote-icon>
+			</div>
+			<div class="help">
+				<img src="/static/icon/who-horizontal.svg" alt="Tipněte si, kdo vyhraje" class="who">
+			</div>
+		</div>
+		<div class="block block-loading" v-if="program.listOfCandidates.length === 0">
+			Kandidátka se právě nahrává, měla by být k dispozici během pár vteřin. Pokud nechcete čekat, můžete se podívat na seznam na webu 
+			<a :href="people(program)" target="_blank" @click="outbound('list', program)" title="kandidátní listina">
+				Českého statistického úřadu
+			</a>.
+		</div>
+		<div class="block block-candidates" v-if="program.listOfCandidates.length > 0">
+			<h2>Celá kandidátka</h2>
+			<ul class="list-of-candidates">
+				<li v-for="(candidate, index) in program.listOfCandidates">
+					<div class="candidate" :class="{red: index === 0}">
+						<h4>{{ candidate.fullname }}</h4>
+						<p><small>{{ candidate.work }}</small></p>
+						<p><small>{{ candidate.age }} let</small></p>
+						<span>{{ candidate.order }}.</span>
+					</div>
+				</li>
+			</ul>
+		</div>
+		<div class="block block-help" v-if="$store.state.votingDisplay === false">
+			<h2>Narazili jste na <span class="red">chybu</span>? Nebo chcete něco <span class="red">doplnit</span>?</h2>
+			<p>Můžete se s námi spojit na <a href="https://facebook.com/programydovoleb" target="_blank"><b>Facebooku</b></a> nebo <a href="https://twitter.com/programydovoleb" target="_blank"><b>Twitteru</b></a>. Pokud máte radši email, posílejte prosím na <a href="mailto:info@programydovoleb.cz"><b>info@programydovoleb.cz</b></a>. Můžete také využít <b><router-link :to="'/kandidat/' + program.HASH + '/form'">formulář</router-link></b>.</p><a name="hlasy-a-tipy"></a>
+		</div>
+		<div class="block block-support">
+			<template v-if="$store.state.votingEnabled === false">
+				<h2>Hlasování a tipování bylo ukončeno</h2>
+				<p>V souladu se zákonem bylo ukončeno zveřejňování nových anket, výzkumů a hlasování. Všechna hlasování a tipy na webu proto odpovídají stavu k 1. říjnu 2018 z 23:59.</p>
+				<h3 v-if="program.tips > 4 || program.votes > 4">Konečný stav</h3>
+			</template>
+			<template v-if="$store.state.votingEnabled === true">
+				<h2>Myslíte, že <em>{{ program.NAZEV }}</em> získá nejvíc hlasů? Nebo jim chcete dát svůj hlas?</h2>
+				<p>Na stránkách Programy do voleb můžete vyjádřit svoji podporu hlasováním pro kandidáta. Zároveň můžete tipovat, zda si myslíte, že získá ve volbách nejvíc hlasů. Váš tip a hlas nemusí být stejnému kandidátovi a můžete je kdykoli změnit. Tipnout si můžete v každém zastupitelstvu, hlas ale máte pouze jeden.</p>
+				<div class="activity">
+					<vote-icon :type="'tip'" :region="program.ID_ZASTUP" :candidate="program.ID" :verbose="true" :link="'kandidat/' + program.HASH"></vote-icon>
+					<vote-icon :type="'vote'" :region="program.ID_ZASTUP" :candidate="program.ID" :verbose="true" :link="'kandidat/' + program.HASH"></vote-icon>
+				</div>
+				<h3 v-if="program.tips > 4 || program.votes > 4">Průběžný stav</h3>
+			</template>
+			<p v-if="program.tips > 4">{{ program.tips}} lidí si myslí, že {{ program.NAZEV }} získá ve volbách na radnici {{ region.NAZEVZAST }} nejvíc hlasů. Jak jsou na tom v porovnání s ostatními? <router-link :to="'/misto/' + region.HASH + '/prubezne-vysledky-tipovani'">Můžete se podívat zde.</router-link></p>
+			<p v-if="program.votes > 4">{{ program.votes }} lidí pro kandidáta hlasovalo. Podívejte se na <router-link :to="'/misto/' + region.HASH + '/prubezne-vysledky-hlasovani'">průběžné výsledky</router-link> hlasování.
+			<img src="/static/icon/vote-selected.svg" alt="" class="desktop-only visual"></p>
+		</div>
+		<div class="block info">
+			<img src="/static/icon/logo-volby.svg" alt="" class="desktop-only visual visual-no-border">
+			<h2>{{ region.NAZEVZAST }} volí <span class="blue">{{ region.ZASTUPITELU }} zastupitelů</span></h2>
+			<p>5. a 6. října půjdeme k volbám do zastupitelstev města o obcí a rozhodneme o podobě komunální politiky na další čtyři roky. Volby do komunálu mají svá specifika a je lepší si je pročíst, než zbytečně přijít o hlas. Ten totiž není jediný, ale každý jich má tolik, kolik je zastupitelských míst. <b>{{ region.NAZEVZAST }} jich má {{ region.ZASTUPITELU }}</b>.</p>
+			<h2 class="red"><span class="red is-link" @click="toggle(1)">Jak mohu hlasovat 5. a 6. října?</span></h2>
+			<div class="collapsible collapsible-1" v-if="show1">
+				<h3>Chci dát všech svých {{ region.ZASTUPITELU }} hlasů <em>{{ program.NAZEV }}</em>:</h3>
+				<p>Nejjednoduší varianta je dát velký křížek straně, tím dostane <em>{{ program.NAZEV }}</em> váš plný počet hlasů.</p>
+				<h3>Chci svých {{ region.ZASTUPITELU }} hlasů rozdělit mezi víc stran:</h3>
+				<p>V tomto případě nedáváte velký křížek <em>{{ program.NAZEV }}</em>, ale označujete jednotlivé kandidáty z více stran. Počet křížků by měl odpovídat počtu vašich hlasů, aby žádný zbytečně nepropadl.</p>
+				<h3>Chci si z kandidátky <em>{{ program.NAZEV }}</em> vybrat jen pár lidí a zbytek hlasů dát jiné straně:</h3>
+				<p>I tohle je možné. Zaškrtejte, kdo se vám z kandidátky <em>{{ program.NAZEV }}</em> líbí a pak vyberte další stranu, a té dejte velký křížek. Vaše hlasy pak budou započítány tak, že nejdřív se rozdají vaši preferovaní kandidáti, a co zbyde, se dá straně. Z {{ region.ZASTUPITELU }} hlasů tak můžete např {{ Math.floor(Number(region.ZASTUPITELU) / 3) }} přidělit různým osobnostem, a pro zbytek hlasů vybrat jednu ze stran.</p>
+			</div>
+			<h2 class="red"><span class="red is-link" @click="toggle(2)">Jak se hlasy počítají?</span></h2>
+			<div class="collapsible collapsible-2" v-show="show2">
+				<p>Počítání v komunálních volbách má dvě fáze. V první se zjišťují strany, které uspěly, a v druhé se určuje pořadí kandidátů. Popis prosím berte jako orientační.</p>
+				<h3>1. krok: strany</h3>
+				<p>V prvním kroku se posčítají všechny hlasy pro stranu a určí se, kolik hlasů získala ze všech odevzdaných. Když to je alespoň 5 %, dostává se do zastupitelstva. Přesný počet mandátů je určen pomocí d'Hontovy metody.</p>
+				<h3>2. krok: mandáty</h3>
+				<p>U stran, které se dostaly do zastupitelstva, se začne přihlížet k počtu preferenčních hlasů. Na rozdíl od parlamentních voleb se ale kandidáti neřadí pouze podle počtu obdržených hlasů. Jedinou možností je posun kandidáta na přední příčku a to jen v případě, že získá o 10 % a víc hlasů než je průměrný počet hlasů v dané straně. Ve velkých městech je tak nutné získat mnoho hlasů pro kandidáta, aby se posunul na první pozici. U malých obcí je to snažší.</p>
+				<h3>Chcete vědět víc?</h3>
+				<p><a href="https://www.youtube.com/watch?v=KVittZNl0H8" target="_blank">Podívejte se na video Otto Eibla a Miloše Gregora</a></p>
+				<p><a href="https://acpo.vedeckecasopisy.cz/publicFiles/00056.pdf" target="_blank">Přečtěte si pohled Tomáše Lebedy</a></p>
+				<p><a href="https://www.zakonyprolidi.cz/cs/2001-491" target="_blank">Podívejte se na znění zákona č. 491/2001 Sb.</a></p>
+				<p><a href="https://cs.wikipedia.org/wiki/Komun%C3%A1ln%C3%AD_volebn%C3%AD_syst%C3%A9m_v_%C4%8Cesk%C3%A9_republice" target="_blank">Základní přehled najdete i na Wikipedii</a></p>
+			</div>
+		</div>
+		<div class="block">
+			<h2>
+				<router-link :to="'/misto/' + region.HASH">Zobrazit přehled kandidátů pro {{ region.NAZEVZAST}}</router-link>
+			</h2>
+		</div>
+		<div class="submenu submenu-fixed" v-if="scrolled > 250">
+			<ul class="submenu-list">
+				<li class="desktop-only"><b>{{ program.CODE != null ? program.CODE : program.NAZEV }}</b></li>
+				<li class="desktop-only">&mdash;</li>
+				<li><a href="#prehled">Přehled</a></li>
+				<li><a href="#lide">Kandidátka</a></li>
+				<li><a href="#hlasy-a-tipy">Hlasy a tipy</a></li>
+			</ul>
+		</div>
+	</template>
+</div>
+

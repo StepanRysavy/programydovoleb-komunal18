@@ -1,0 +1,73 @@
+.vote {
+	display: inline;
+}
+
+.icon {
+	display: inline-block;
+	margin-right: .5em;
+
+	&:hover {
+		cursor: pointer;
+	}
+
+	.holder {
+		margin: auto;
+		width: 2.5rem;
+		height: 2.5rem;
+		position: relative;
+	}
+
+	img {
+		display: block;
+		width: 2.5rem;
+		height: 2.5rem;
+		border-radius: 50%;
+		border: 1px solid #eee;
+		overflow: hidden;
+		position: absolute;
+		background: #fff;
+
+		&.hover {
+			opacity: 0;
+			transition: opacity .25s;
+		}
+	}
+
+	&:hover img.hover {
+		opacity: 1;
+	}
+
+	&.bigger .holder,
+	&.bigger img {
+		width: 3rem;
+		height: 3rem;
+	}
+
+	span {
+		font-size: 9px;
+		text-transform: uppercase;
+		color: #aaa;
+		display: block;
+		font-weight: bold;
+		margin: .5rem auto 0;
+
+		transition: color .25s, opacity .25s;
+		text-align: center;
+	}
+
+	&:hover span {
+		color: #444;
+	}
+}
+
+@media (min-width: 40rem) {
+	.layout-detail {
+		.social span {
+			opacity: 0;
+		}
+
+		tr:hover .social span {
+			opacity: 1;
+		}
+	}
+}

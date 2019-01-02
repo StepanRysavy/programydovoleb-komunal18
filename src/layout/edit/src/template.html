@@ -1,0 +1,43 @@
+<div class="layout-edit" v-if="program">
+	<h1>Navrhnout úpravu</h1>
+	<p>Všechny zaslané údaje prověřujeme, nezobrazují se proto ihned.</p>
+	
+	<div class="add">	
+		<div class="add-input">
+			<label>Kandidát</label> 
+			{{ program.NAZEV }}
+		</div>
+		<div class="add-input">
+			<label>Místo</label> 
+			{{ region.NAZEVZAST }} 
+		</div>
+		<div class="add-input add-link add-link-heslo">
+			<label>Motto kampaně</label> 
+			<input type="text" v-model="heslo" placeholder="Volební motto strany">
+			<button :disabled="heslo.length === 0" @click="sendForm('heslo')">Odeslat motto</button>
+			<p>Děkujeme za zaslání. Motto ověříme a přidáme.</p>
+		</div>
+		<div class="add-input add-link add-link-www">
+			<label>Program</label> 
+			<input type="url" v-model="www" placeholder="http://strana.cz/program">
+			<button :disabled="disabled(www)" @click="sendForm('www')">Odeslat program</button>
+			<p>Děkujeme za zaslání. Odkaz zkontrolujeme a přidáme.</p>
+		</div>
+		<div class="add-input add-link add-link-fb">
+			<label>Facebook</label> 
+			<input type="url" v-model="fb" placeholder="https://facebook.com/strana">
+			<button :disabled="disabled(fb)" @click="sendForm('fb')">Odeslat odkaz</button>
+			<p>Děkujeme za zaslání. Odkaz zkontrolujeme a přidáme.</p>
+		</div>
+		<div class="add-input add-link add-link-tw">
+			<label>Twitter</label> 
+			<input type="url" v-model="tw" placeholder="https://twitter.com/strana">
+			<button :disabled="disabled(tw)" @click="sendForm('tw')">Odeslat odkaz</button>
+			<p>Děkujeme za zaslání. Odkaz zkontrolujeme a přidáme.</p>
+		</div>
+	</div>
+	<div class="list">
+		<a href="javascript:window.history.go(-1)" class="button">Zavřít formulář</a>
+	</div>
+</div>
+

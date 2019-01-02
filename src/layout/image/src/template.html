@@ -1,0 +1,24 @@
+<div class="layout-image">
+	<template v-if="$store.state.images.loaded === true">
+		<img :src="'https://komunal18.programydovoleb.cz/files/' + image.IMG" :alt="image.TITLE">
+		<h1>{{ image.TITLE }}</h1>
+		<p>{{ image.DESCRIPTION }}</p>
+		<div class="actions">
+			<a class="button" :href="'http://www.facebook.com/sharer/sharer.php?u=' + encodeURI(link(image.HASH))" target="_blank" @click="outbound('fb', image)">
+				sdílet
+			</a>
+			&nbsp;
+			<a class="button" :href="'http://twitter.com/share?text=' + encodeURI(image.TITLE) + '&url=' + encodeURI(link(image.HASH) + '&via=programydovoleb')" target="_blank" @click="outbound('tw', image)">
+				tweetnout
+			</a>
+			&nbsp;
+			<router-link class="button" to="/infografika">seznam</router-link>
+		</div>
+		<div class="actions" v-if="$store.state.images.data.length > 2">
+			<h2>Jiné obrázky</h2>
+
+			<list-of-images :list="nearImages" :columns="2"></list-of-images>
+		</div>
+	</template>
+</div>
+
